@@ -28,23 +28,30 @@ shift # using this we shifted first argument and
 COMMENT="$@" # we have taken remaining all part as comment using $#.
 
 # Create a password
-PASSWORD=$(date +%s+N)
+PASSWORD=$(date +%s%N)
 
 #Create user
 useradd -c "$COMMENT" -m $USER_NAME
 
+# Check if the user already exists
+if [ $? -eq 9 ]
+then
+    echo "User '$USER_NAME' already exists. Exiting."
+    exit 1
+fi
+
 #Check if the user succefully created or not
-if [[ ? -ne 0 ]]
+if [[ $? -ne 0 ]]
 then
 	echo "The acount could not be created."
 	exit 1
 fi
 
 # Set the password for the user
-echo $PASSWORD | passwd --stdin $USER_NAME
+echo "$USER_NAME:$PASSWORD" | chpasswd
 
 # Check if password is successfully set or not
-if [[ ? -ne 0 ]]
+if [[ $? -ne 0 ]]
 then
 	echo "Password could not be set."
 	exit 1
